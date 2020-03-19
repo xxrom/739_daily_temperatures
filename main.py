@@ -3,59 +3,44 @@ from typing import List
 
 class Solution:
 
-  def getNextValueIndex(self, dictValues: dict, value: int, currentIndex: int,
-                        maxValue: int) -> int:
-    print(dictValues, maxValue)
+  def dailyTemperatures(self, T: List[int]) -> List[int]:
+    if len(T) == 0:
+      return []
 
-    # get maxValue
-    nearestIndex = dictValues[maxValue]
+    max = T[len(T) - 1]
+    ans = [0] * len(T)
 
-    for item in dictValues:
-      dictIndex = dictValues[item]
+    # cycle from end to start
+    for i in range(len(T) - 1, -1, -1):
+      value = T[i]
 
-      print('index %d/ value %d' % (dictIndex, item))
-      if item > value and dictIndex < nearestIndex:
-        nearestIndex = dictIndex
-
-    return nearestIndex - currentIndex
-
-  def dailyTemperatures(self, temp: List[int]) -> List[int]:
-    # print(temp)
-
-    dictValues = {}
-    min = temp[len(temp) - 1] if len(temp) > 0 else None
-    max = temp[len(temp) - 1] if len(temp) > 0 else None
-    if min != None:
-      dictValues[min] = len(temp) - 1
-
-    ans = []
-    for i in range(len(temp) - 1, -1, -1):
-
-      value = temp[i]
       if value < max:
-        ans.append(self.getNextValueIndex(dictValues, value, i, max))
-      else:
-        ans.append(0)
+        # index for checking
+        nearestIndex = i + 1
+        # check next value more then current temperature
+        while T[nearestIndex] <= T[i]:
+          # !!! the main speed improvement !!!
+          # dynamic programming - get ans from previous steps
+          nearestIndex += ans[nearestIndex]
+        ans[i] = nearestIndex - i
 
-      if value < min:
-        min = value
       if value > max:
         max = value
 
-      dictValues[value] = i
-
-    ans.reverse()
     return ans
 
 
 my = Solution()
-# v = [73, 74, 75, 71, 69, 72, 76, 73]  # 0
+v = [73, 74, 75, 71, 69, 72, 76, 73]  # 0
 # v = [89, 62, 70, 58, 47, 47, 46, 76, 100, 70]  # 1
-v = [80, 34, 80, 80, 80, 34, 34, 34, 34, 34]  # 1
+# v = [80, 34, 80, 80, 80, 34, 34, 34, 34, 34]  # 2
 ans = my.dailyTemperatures(v)
 print("ans", ans)
 
-# nAns = [1, 1, 4, 2, 1, 1, 0, 0]  # 0
-nAns = [0, 1, 0, 0, 0, 0, 0, 0, 0, 0]  # 1
+nAns = [1, 1, 4, 2, 1, 1, 0, 0]  # 0
+# nAns = [0, 1, 0, 0, 0, 0, 0, 0, 0, 0]  # 2
 
 print(ans == nAns)
+
+# Runtime: 468 ms, faster than 98.44% of Python3 online submissions for Daily Temperatures.
+# Memory Usage: 16.2 MB, less than 100.00% of Python3 online submissions for Daily Temperatures.
